@@ -11,8 +11,6 @@ extension StringExt on String {
 
 extension BoolExt on bool {
 
-  bool reverse() => (this) ? false: true;
-
   String waterImage(int strength) =>
       (this) ? "assets/images/w$strength.gif":
       "assets/images/transparent.png";
@@ -23,6 +21,9 @@ extension BoolExt on bool {
 }
 
 extension DoubleExt on double {
+
+  double appBarHeight() => (this < 660) ? (this - 60) / 10 + 20: 80;
+  double titleScaleFactor() => (this < 510) ? (this - 60) / 300: 1.5;
 
   double circleButtonSize() => (this < 660) ? (this - 60) / 3: 200.0;
   double circleButtonPadding() => (this < 660) ? (this - 60) / 30: 20.0;
@@ -42,5 +43,9 @@ extension DoubleExt on double {
 
   double lampSize() => (this < 660) ? (this - 60) / 25 + 4: 28.0;
   double lampPadding() => (this < 660) ? (this - 60) / 120: 5.0;
+
+  double admobHeight() => (this < 680) ? 50: (this < 1180) ? 50 + (this - 680) / 10: 100;
+  double admobWidth() => this - 100;
+
 }
 

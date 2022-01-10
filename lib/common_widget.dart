@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:app_tracking_transparency/app_tracking_transparency.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'common_extension.dart';
 
 Future<void> initPlugin() async {
@@ -10,19 +11,20 @@ Future<void> initPlugin() async {
   }
 }
 
-Text appTitleText(String title) =>
+Text appTitleText(BuildContext context, String title) =>
     Text(title,
       style: const TextStyle(
         fontFamily: "cornerStone",
-        fontSize: 28,
+        fontSize: 30,
         color: Colors.white,
       ),
+      textScaleFactor: MediaQuery.of(context).size.width.titleScaleFactor(),
     );
 
 Widget toiletImage(BuildContext context) =>
     Container(
       alignment: Alignment.center,
-      height: MediaQuery.of(context).size.height * 0.6,
+      height: MediaQuery.of(context).size.height * 0.55,
       decoration: const BoxDecoration(
         image: DecorationImage(
           alignment: Alignment.center,
@@ -35,8 +37,8 @@ Widget toiletImage(BuildContext context) =>
 Widget waterImage(BuildContext context, bool isWashing, int washStrength) =>
     Container(
       alignment: Alignment.center,
-      margin: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.2),
-      height: MediaQuery.of(context).size.height * 0.2,
+      margin: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.13),
+      height: MediaQuery.of(context).size.height * 0.25,
       child: Image(image: AssetImage(isWashing.waterImage(washStrength))),
     );
 
@@ -138,5 +140,13 @@ ButtonStyle rectangleButtonStyle(BuildContext context) {
     foregroundColor: MaterialStateProperty.all<Color>(Colors.transparent),
     shadowColor: MaterialStateProperty.all(Colors.transparent),
     backgroundColor: MaterialStateProperty.all<Color>(Colors.white),
+  );
+}
+
+Widget adMobBannerWidget(BuildContext context, BannerAd myBanner) {
+  return SizedBox(
+    width: MediaQuery.of(context).size.width.admobWidth(),
+    height: MediaQuery.of(context).size.height.admobHeight(),
+    child: AdWidget(ad: myBanner),
   );
 }
