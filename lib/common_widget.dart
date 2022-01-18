@@ -1,152 +1,166 @@
 import 'package:flutter/material.dart';
-import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'common_extension.dart';
 
-Future<void> initPlugin() async {
-  final status = await AppTrackingTransparency.trackingAuthorizationStatus;
-  if (status == TrackingStatus.notDetermined) {
-    await Future.delayed(const Duration(milliseconds: 200));
-    await AppTrackingTransparency.requestTrackingAuthorization();
-  }
-}
-
-Text appTitleText(BuildContext context, String title) =>
+Text appTitleText(double width, String title) =>
     Text(title,
       style: const TextStyle(
         fontFamily: "cornerStone",
         fontSize: 30,
         color: Colors.white,
       ),
-      textScaleFactor: MediaQuery.of(context).size.width.titleScaleFactor(),
+      textScaleFactor: width.titleScaleFactor(),
     );
 
-Widget toiletImage(BuildContext context) =>
+Widget toiletImage(double height) =>
     Container(
       alignment: Alignment.center,
-      height: MediaQuery.of(context).size.height * 0.55,
+      height: height * 0.55,
       decoration: const BoxDecoration(
         image: DecorationImage(
-          alignment: Alignment.center,
           image: AssetImage("assets/images/toilet.jpg"),
           fit: BoxFit.fitHeight,
         ),
       ),
     );
 
-Widget waterImage(BuildContext context, bool isWashing, int washStrength) =>
+Widget nozzleImage(double height, bool isNozzle) =>
+    Container(
+      alignment: Alignment.topCenter,
+      padding: EdgeInsets.only(top: height * 0.31),
+      child: AnimatedContainer(
+        width: height * 0.01,
+        height: height * isNozzle.nozzleLength(),
+        duration: const Duration(seconds: 3),
+        decoration: metalDecoration(),
+      )
+    );
+
+Widget waterImage(double height, bool isWashing, int washStrength) =>
     Container(
       alignment: Alignment.center,
-      margin: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.13),
-      height: MediaQuery.of(context).size.height * 0.25,
+      height: height * 0.25,
+      margin: EdgeInsets.only(top: height * 0.115),
       child: Image(image: AssetImage(isWashing.waterImage(washStrength))),
     );
 
-ButtonStyle circleButtonStyle(BuildContext context, Color color) {
-  final width = MediaQuery.of(context).size.width;
-  return ButtonStyle(
-    padding: MaterialStateProperty.all<EdgeInsets>(const EdgeInsets.all(0)),
-    shape: MaterialStateProperty.all<CircleBorder>(
-      CircleBorder(
-        side: BorderSide(color: color, width: width.circleBorderWidth()),
+BoxDecoration metalDecoration() =>
+    const BoxDecoration(
+      gradient: LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        stops: [0, 0.4, 0.7, 0.8, 0.9],
+        colors: [
+          Colors.white70,
+          Colors.white38,
+          Colors.white12,
+          Colors.black45,
+          Colors.white38,
+        ],
+      )
+    );
+
+ButtonStyle circleButtonStyle(double width, Color backgroundColor, Color borderColor) =>
+    ButtonStyle(
+      padding: MaterialStateProperty.all<EdgeInsets>(const EdgeInsets.all(0)),
+      shape: MaterialStateProperty.all<CircleBorder>(width.circleButtonBorder(borderColor)),
+      minimumSize: MaterialStateProperty.all(Size.zero),
+      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      overlayColor: MaterialStateProperty.all<Color>(Colors.transparent),
+      foregroundColor: MaterialStateProperty.all<Color>(Colors.transparent),
+      shadowColor: MaterialStateProperty.all(Colors.transparent),
+      backgroundColor: MaterialStateProperty.all<Color>(backgroundColor),
+    );
+
+ButtonStyle smallCircleStyle(double width, Color backgroundColor, Color borderColor) =>
+    ButtonStyle(
+      padding: MaterialStateProperty.all<EdgeInsets>(const EdgeInsets.all(0)),
+      shape: MaterialStateProperty.all<CircleBorder>(width.smallCircleBorder(borderColor)),
+      minimumSize: MaterialStateProperty.all(Size.zero),
+      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      overlayColor: MaterialStateProperty.all<Color>(Colors.transparent),
+      foregroundColor: MaterialStateProperty.all<Color>(Colors.transparent),
+      shadowColor: MaterialStateProperty.all(Colors.transparent),
+      backgroundColor: MaterialStateProperty.all<Color>(backgroundColor),
+    );
+
+Text volumeText(double width, bool isPlus) =>
+    Text(isPlus ? "＋": "➖",
+      style: const TextStyle(
+        color: Colors.black,
+        fontWeight: FontWeight.bold,
+        fontSize: 20.0,
       ),
-    ),
-    minimumSize: MaterialStateProperty.all(Size.zero),
-    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-    overlayColor: MaterialStateProperty.all<Color>(Colors.transparent),
-    foregroundColor: MaterialStateProperty.all<Color>(Colors.transparent),
-    shadowColor: MaterialStateProperty.all(Colors.transparent),
-    backgroundColor: MaterialStateProperty.all<Color>(Colors.white),
-  );
-}
+      textScaleFactor: width.rectangleScaleFactor(),
+    );
 
-ButtonStyle smallButtonStyle(BuildContext context, Color color) {
-  final width = MediaQuery.of(context).size.width;
-  return ButtonStyle(
-    padding: MaterialStateProperty.all<EdgeInsets>(const EdgeInsets.all(0)),
-    shape: MaterialStateProperty.all<CircleBorder>(
-      CircleBorder(
-        side: BorderSide(color: color, width: width.smallBorderWidth()),
+
+Widget volumeLamp(double width, int lampNumber, int volume, Color? color) =>
+    Container(
+      width: width.lampSize(),
+      height: width.lampSize(),
+      padding: width.lampPadding(),
+      child: TextButton(
+        child: const Text(""),
+        style: lampCircleStyle(lampNumber.lampColor(volume, color)),
+        onPressed: () {},
       ),
-    ),
-    minimumSize: MaterialStateProperty.all(Size.zero),
-    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-    overlayColor: MaterialStateProperty.all<Color>(Colors.transparent),
-    foregroundColor: MaterialStateProperty.all<Color>(Colors.transparent),
-    shadowColor: MaterialStateProperty.all(Colors.transparent),
-    backgroundColor: MaterialStateProperty.all<Color>(Colors.white),
-  );
-}
+    );
 
 
-Text volumeText(BuildContext context, bool isPlus) {
-  final width = MediaQuery.of(context).size.width;
-  return Text(isPlus ? "＋": "−",
-    style: const TextStyle(
-      color: Colors.black,
-      fontWeight: FontWeight.bold,
-      fontSize: 20.0,
-    ),
-    textScaleFactor: width.plusMinusScaleFactor(),
-  );
-}
-
-Widget volumeLamp(BuildContext context, int lampNumber, int volume, Color color) {
-  final width = MediaQuery.of(context).size.width;
-  return Container(
-    width: width.lampSize(),
-    height: width.lampSize(),
-    padding: EdgeInsets.all(width.lampPadding()),
-    child: ElevatedButton(
-      style: circleColorStyle(
-        (lampNumber == volume) ? color : Colors.black
-      ),
-      onPressed: () {},
-      child: const Text(""),
-    ),
-  );
-}
-
-ButtonStyle circleColorStyle(Color backgroundColor) {
+ButtonStyle lampCircleStyle(Color color) {
+  const lampBorder = CircleBorder(side: BorderSide(color: Colors.black, width: 2));
   return ButtonStyle(
     padding: MaterialStateProperty.all<EdgeInsets>(const EdgeInsets.all(5)),
-    shape: MaterialStateProperty.all<CircleBorder>(
-      const CircleBorder(side: BorderSide(color: Colors.black, width: 2)),
-    ),
+    shape: MaterialStateProperty.all<CircleBorder>(lampBorder),
     minimumSize: MaterialStateProperty.all(Size.zero),
     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
     overlayColor: MaterialStateProperty.all<Color>(Colors.transparent),
     foregroundColor: MaterialStateProperty.all<Color>(Colors.transparent),
     shadowColor: MaterialStateProperty.all(Colors.transparent),
-    backgroundColor: MaterialStateProperty.all<Color>(backgroundColor),
+    backgroundColor: MaterialStateProperty.all<Color>(color),
   );
 }
 
-ButtonStyle rectangleButtonStyle(BuildContext context) {
-  return ButtonStyle(
-    padding: MaterialStateProperty.all<EdgeInsets>(const EdgeInsets.all(0)),
-    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-      RoundedRectangleBorder(
-        side: BorderSide(
-            color: Colors.grey,
-            width: MediaQuery.of(context).size.width.plusMinusBorderWidth()
+ButtonStyle rectangleButtonStyle(double width, Color backgroundColor, Color borderColor) =>
+    ButtonStyle(
+      padding: MaterialStateProperty.all<EdgeInsets>(const EdgeInsets.all(0)),
+      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+        RoundedRectangleBorder(
+          side: BorderSide(color: borderColor, width: width.rectangleBorderWidth()),
+          borderRadius: BorderRadius.circular(width.rectangleRadius()),
         ),
-        borderRadius: BorderRadius.circular(10.0),
       ),
-    ),
-    minimumSize: MaterialStateProperty.all(Size.zero),
-    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-    overlayColor: MaterialStateProperty.all<Color>(Colors.transparent),
-    foregroundColor: MaterialStateProperty.all<Color>(Colors.transparent),
-    shadowColor: MaterialStateProperty.all(Colors.transparent),
-    backgroundColor: MaterialStateProperty.all<Color>(Colors.white),
-  );
-}
+      minimumSize: MaterialStateProperty.all(Size.zero),
+      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      overlayColor: MaterialStateProperty.all<Color>(Colors.transparent),
+      foregroundColor: MaterialStateProperty.all<Color>(Colors.transparent),
+      shadowColor: MaterialStateProperty.all(Colors.transparent),
+      backgroundColor: MaterialStateProperty.all<Color>(backgroundColor),
+    );
 
-Widget adMobBannerWidget(BuildContext context, BannerAd myBanner) {
-  return SizedBox(
-    width: MediaQuery.of(context).size.width.admobWidth(),
-    height: MediaQuery.of(context).size.height.admobHeight(),
-    child: AdWidget(ad: myBanner),
-  );
-}
+ButtonStyle wideRectangleStyle(double width, Color backgroundColor, Color borderColor) =>
+    ButtonStyle(
+      padding: MaterialStateProperty.all<EdgeInsets>(const EdgeInsets.all(0)),
+      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+        RoundedRectangleBorder(
+          side: BorderSide(color: borderColor, width: width.wideRectangleBorderWidth()),
+          borderRadius: BorderRadius.circular(width.wideRectangleRadius()),
+        ),
+      ),
+      minimumSize: MaterialStateProperty.all(Size.zero),
+      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      overlayColor: MaterialStateProperty.all<Color>(Colors.transparent),
+      foregroundColor: MaterialStateProperty.all<Color>(Colors.transparent),
+      shadowColor: MaterialStateProperty.all(Colors.transparent),
+      backgroundColor: MaterialStateProperty.all<Color>(backgroundColor),
+    );
+
+
+Widget adMobBannerWidget(double width, double height, BannerAd myBanner) =>
+    SizedBox(
+      width: width.admobWidth(),
+      height: height.admobHeight(),
+      child: AdWidget(ad: myBanner),
+    );
+
