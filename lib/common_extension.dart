@@ -41,12 +41,13 @@ extension DoubleExt on double {
   double titleScaleFactor() => (this < 510) ? (this - 60) / 300: 1.5;
 
   //Wash Start & Stop Button
-  double circleButtonSize() => (this < 660) ? (this - 20) / 4: 160.0;
+  double circleButtonSize() => (this < 660) ? (this - 60) / 3: 200.0;
   double circlePaddingSize() => (this < 660) ? (this - 60) / 60: 10.0;
   EdgeInsets circleButtonPadding() => EdgeInsets.all(circlePaddingSize());
   double circleBorderSize() => (this < 660) ? (this - 60) / 60: 10.0;
   CircleBorder circleButtonBorder(Color color) =>
       CircleBorder(side: BorderSide(color: color, width: circleBorderSize()));
+  double circleBottomTopMargin() => (this < 660) ? (this - 60) / 30: 20;
 
   //Music Play & Stop Button
   double smallCircleSize() => (this < 660) ? (this - 60) / 5: 120.0;
@@ -57,7 +58,7 @@ extension DoubleExt on double {
       CircleBorder(side: BorderSide(color: color, width: smallCircleBorderWidth()));
 
   //Plus Minus Button
-  double rectangleButtonSize() => (this < 660) ? (this - 30) / 9: 70.0;
+  double rectangleButtonSize() => (this < 660) ? (this - 60) / 7.5: 80.0;
   double rectangleButtonPadding() => (this < 600) ? (this - 60) / 120: 5.0;
   double rectangleScaleFactor() => (this < 660) ? (this - 60) / 300: 2.0;
   double rectangleBorderWidth() => (this < 660) ? (this - 60) / 120: 5.0;
@@ -74,7 +75,6 @@ extension DoubleExt on double {
   EdgeInsets lampPadding() =>
       EdgeInsets.all((this < 660) ? (this - 60) / 120: 5.0);
   double lampTopSpaceSize() => (this < 660) ? (this - 60) / 100: 6.0;
-  double lampBottomSpaceSize() => (this < 660) ? (this - 60) / 12: 50;
 
   //Admob
   double admobHeight() => (this < 680) ? 50: (this < 1180) ? 50 + (this - 680) / 10: 100;

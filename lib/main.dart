@@ -9,11 +9,10 @@ import 'dart:async';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  //向き指定(縦固定)
-  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]); //縦向き指定
   MobileAds.instance.initialize();
   await Firebase.initializeApp();
-  runApp(const MyApp(),);
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {

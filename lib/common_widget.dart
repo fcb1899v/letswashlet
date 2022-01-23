@@ -1,6 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'common_extension.dart';
+
+Future<void> initPlugin() async {
+  final status = await AppTrackingTransparency.trackingAuthorizationStatus;
+  if (status == TrackingStatus.notDetermined) {
+    await Future.delayed(const Duration(milliseconds: 200));
+    await AppTrackingTransparency.requestTrackingAuthorization();
+  }
+}
 
 Text appTitleText(double width, String title) =>
     Text(title,
@@ -84,14 +93,15 @@ ButtonStyle smallCircleStyle(double width, Color backgroundColor, Color borderCo
       backgroundColor: MaterialStateProperty.all<Color>(backgroundColor),
     );
 
-Text volumeText(double width, bool isPlus) =>
-    Text(isPlus ? "＋": "➖",
-      style: const TextStyle(
-        color: Colors.black,
-        fontWeight: FontWeight.bold,
-        fontSize: 20.0,
-      ),
-      textScaleFactor: width.rectangleScaleFactor(),
+Widget volumeText(double width, bool isPlus) =>
+    Column(
+      children: [
+        Text(isPlus ? "+": "-",
+          style: const TextStyle(color: Colors.black, fontSize: 26.0),
+          textScaleFactor: width.rectangleScaleFactor(),
+        ),
+        const Spacer(),
+      ],
     );
 
 

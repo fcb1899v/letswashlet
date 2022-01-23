@@ -1,4 +1,3 @@
-import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import 'package:flutter/material.dart';
 import 'package:vibration/vibration.dart';
 import 'package:audioplayers/audioplayers.dart';
@@ -114,7 +113,6 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       body: Container(color: Colors.white,
-        alignment: Alignment.topCenter,
         child: Column(
           children: [
             const Spacer(flex: 3),
@@ -127,6 +125,7 @@ class _MyHomePageState extends State<MyHomePage> {
             Row(children: [
               const Spacer(flex: 2),
               Column(children: [
+                SizedBox(height: width.circleBottomTopMargin()),
                 Row(children: [
                   washStopButton(width),
                   washStartButton(width),
@@ -141,7 +140,6 @@ class _MyHomePageState extends State<MyHomePage> {
                   volumeLamp(width, 5, washStrength, deepGreen!),
                   washPlusMinusButton(width, true),
                 ]),
-                SizedBox(height: width.lampBottomSpaceSize())
               ]),
               const Spacer(flex: 1),
               Column(children: [
@@ -257,10 +255,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _playMusic() async {
     Vibration.vibrate(duration: vibTime, amplitude: vibAmp);
-    musicAudioPlayer = await _musicPlayer.play(musicAudio, volume: musicVolume.musicVolume());
+    musicAudioPlayer = await _musicPlayer.loop(musicAudio, volume: musicVolume.musicVolume());
     setState(() => isListening = true);
     "isListening: $isListening".debugPrint();
-    await Future.delayed(Duration(seconds: musicTime)).then((_) =>_stopMusic());
   }
 
   Widget musicStopButton(double width) {
@@ -328,13 +325,5 @@ class _MyHomePageState extends State<MyHomePage> {
         "isFlushing: $isFlushing".debugPrint();
       });
     }
-  }
-}
-
-Future<void> initPlugin() async {
-  final status = await AppTrackingTransparency.trackingAuthorizationStatus;
-  if (status == TrackingStatus.notDetermined) {
-    await Future.delayed(const Duration(milliseconds: 200));
-    await AppTrackingTransparency.requestTrackingAuthorization();
   }
 }
