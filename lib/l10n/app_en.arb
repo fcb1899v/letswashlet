@@ -1,3 +1,4 @@
 {
-  "appTitle": "LETS WASH", "@appTitle": {"description": "App title"}
+  "appTitle": "LETS WASH", "@appTitle": {"description": ""},
+  "thisApp": "This app is a realistic toilet simulator with only buttons operation.", "@thisApp": {"description": ""}
 }
