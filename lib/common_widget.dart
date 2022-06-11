@@ -1,33 +1,63 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'common_extension.dart';
+import 'extension.dart';
+import 'constant.dart';
 
-Future<void> initPlugin() async {
+Future<void> initPlugin(BuildContext context) async {
   final status = await AppTrackingTransparency.trackingAuthorizationStatus;
+  DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+  final iosInfo = await deviceInfo.iosInfo;
+  final iosOsVersion = iosInfo.systemVersion!;
   if (status == TrackingStatus.notDetermined) {
+    if (double.parse(iosOsVersion) >= 15) {
+      "iOS${double.parse(iosOsVersion)}".debugPrint();
+      await showCupertinoDialog(context: context,
+          builder: (context) {
+            return CupertinoAlertDialog(
+              title: Text(AppLocalizations.of(context)!.appTitle),
+              content: Text(AppLocalizations.of(context)!.thisApp),
+              actions: [
+                CupertinoDialogAction(
+                  child: const Text('OK'),
+                  onPressed: () => Navigator.pop(context),
+                )
+              ],
+            );
+          }
+      );
+    }
     await Future.delayed(const Duration(milliseconds: 200));
     await AppTrackingTransparency.requestTrackingAuthorization();
   }
 }
 
-Text appTitleText(double width, String title) =>
-    Text(title,
-      style: const TextStyle(
-        fontFamily: "cornerStone",
-        fontSize: 30,
-        color: Colors.white,
+AppBar myHomeAppBar(double width) =>
+    AppBar(
+      title: Text(title,
+        style: const TextStyle(
+          fontFamily: "cornerStone",
+          fontSize: 30,
+          color: whiteColor,
+        ),
+        textScaleFactor: width.titleScaleFactor(),
       ),
-      textScaleFactor: width.titleScaleFactor(),
+      centerTitle: true,
+      backgroundColor: blackColor,
     );
 
+
+/// Toilet Image
 Widget toiletImage(double height) =>
     Container(
       alignment: Alignment.center,
-      height: height * 0.55,
+      height: height * toiletImageHeightRate,
       decoration: const BoxDecoration(
         image: DecorationImage(
-          image: AssetImage("assets/images/toilet.jpg"),
+          image: AssetImage(toiletJpgImage),
           fit: BoxFit.fitHeight,
         ),
       ),
@@ -36,11 +66,11 @@ Widget toiletImage(double height) =>
 Widget nozzleImage(double height, bool isNozzle) =>
     Container(
       alignment: Alignment.topCenter,
-      padding: EdgeInsets.only(top: height * 0.31),
+      padding: EdgeInsets.only(top: height * nozzleTopPaddingRate),
       child: AnimatedContainer(
-        width: height * 0.01,
+        width: height * nozzleWidthRate,
         height: height * isNozzle.nozzleLength(),
-        duration: const Duration(seconds: 3),
+        duration: const Duration(seconds: nozzleMovingTime),
         decoration: metalDecoration(),
       )
     );
@@ -48,8 +78,8 @@ Widget nozzleImage(double height, bool isNozzle) =>
 Widget waterImage(double height, bool isWashing, int washStrength) =>
     Container(
       alignment: Alignment.center,
-      height: height * 0.25,
-      margin: EdgeInsets.only(top: height * 0.115),
+      height: height * waterImageHeightRate,
+      margin: EdgeInsets.only(top: height * waterTopMarginRate),
       child: Image(image: AssetImage(isWashing.waterImage(washStrength))),
     );
 
@@ -69,76 +99,122 @@ BoxDecoration metalDecoration() =>
       )
     );
 
-ButtonStyle circleButtonStyle(double width, Color backgroundColor, Color borderColor) =>
+/// Wash Widget
+Widget washButtonImage(double width, bool isStart) =>
+    SizedBox(
+      width: width.washButtonSize(),
+      child: Image(image: AssetImage(
+        isStart ? startWashImage: stopWashImage,
+      )),
+    );
+
+ButtonStyle washButtonStyle(double width, bool isStart) =>
     ButtonStyle(
       padding: MaterialStateProperty.all<EdgeInsets>(const EdgeInsets.all(0)),
-      shape: MaterialStateProperty.all<CircleBorder>(width.circleButtonBorder(borderColor)),
+      shape: MaterialStateProperty.all<CircleBorder>(CircleBorder(side: BorderSide(
+        color: isStart ? deepBlue!: deepOrange!,
+        width: width.thickBorderWidth(),
+      ))),
       minimumSize: MaterialStateProperty.all(Size.zero),
       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
       overlayColor: MaterialStateProperty.all<Color>(Colors.transparent),
       foregroundColor: MaterialStateProperty.all<Color>(Colors.transparent),
       shadowColor: MaterialStateProperty.all(Colors.transparent),
-      backgroundColor: MaterialStateProperty.all<Color>(backgroundColor),
+      backgroundColor: MaterialStateProperty.all<Color>(isStart ? whiteColor: lightOrange!),
     );
 
-ButtonStyle smallCircleStyle(double width, Color backgroundColor, Color borderColor) =>
+
+/// Music Widget
+Widget musicButtonImage(double width, bool isPlay) =>
+    SizedBox(
+      width: width.musicButtonSize(),
+      height: width.musicButtonSize(),
+      child: Image(image: AssetImage(isPlay ? musicImage: stopWashImage)),
+    );
+
+ButtonStyle musicButtonStyle(double width, bool isPlay) =>
     ButtonStyle(
       padding: MaterialStateProperty.all<EdgeInsets>(const EdgeInsets.all(0)),
-      shape: MaterialStateProperty.all<CircleBorder>(width.smallCircleBorder(borderColor)),
+      shape: MaterialStateProperty.all<CircleBorder>(CircleBorder(side: BorderSide(
+        color: isPlay ? lightGreen!: borderBlack,
+        width: width.thinBorderWidth()
+      ))),
       minimumSize: MaterialStateProperty.all(Size.zero),
       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
       overlayColor: MaterialStateProperty.all<Color>(Colors.transparent),
       foregroundColor: MaterialStateProperty.all<Color>(Colors.transparent),
       shadowColor: MaterialStateProperty.all(Colors.transparent),
-      backgroundColor: MaterialStateProperty.all<Color>(backgroundColor),
+      backgroundColor: MaterialStateProperty.all<Color>(whiteColor),
     );
 
-Widget volumeText(double width, bool isPlus) =>
-    Column(
-      children: [
+/// Volume Widget
+Widget volumeButtonImage(double width, bool isPlus) =>
+    SizedBox(
+      width: width.volumeButtonSize(),
+      height: width.volumeButtonSize(),
+      child: Column(children: [
         Text(isPlus ? "+": "-",
-          style: const TextStyle(color: Colors.black, fontSize: 26.0),
-          textScaleFactor: width.rectangleScaleFactor(),
+          style: const TextStyle(color: blackColor, fontSize: 26.0),
+          textScaleFactor: width.volumeScaleFactor(),
         ),
-        const Spacer(),
-      ],
+      ])
     );
 
+ButtonStyle volumeButtonStyle(double width) =>
+    ButtonStyle(
+      padding: MaterialStateProperty.all<EdgeInsets>(const EdgeInsets.all(0)),
+      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+        RoundedRectangleBorder(
+          side: BorderSide(
+            color: greyColor,
+            width: width.thinBorderWidth(),
+          ),
+          borderRadius: BorderRadius.circular(width.buttonRadius()),
+        ),
+      ),
+      minimumSize: MaterialStateProperty.all(Size.zero),
+      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      overlayColor: MaterialStateProperty.all<Color>(Colors.transparent),
+      foregroundColor: MaterialStateProperty.all<Color>(Colors.transparent),
+      shadowColor: MaterialStateProperty.all(Colors.transparent),
+      backgroundColor: MaterialStateProperty.all<Color>(whiteColor),
+    );
 
 Widget volumeLamp(double width, int lampNumber, int volume, Color? color) =>
     Container(
       width: width.lampSize(),
       height: width.lampSize(),
-      padding: width.lampPadding(),
-      child: TextButton(
-        child: const Text(""),
-        style: lampCircleStyle(lampNumber.lampColor(volume, color)),
-        onPressed: () {},
+      padding: EdgeInsets.all(width.lampPadding()),
+      decoration: const BoxDecoration(
+        shape: BoxShape.circle,
+        color: blackColor,
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: lampNumber.lampColor(volume, color),
+        ),
       ),
     );
 
+///Flush Widget
+Widget flushButtonImage(double width) =>
+    SizedBox(
+      width: width.flushButtonWidth(),
+      height: width.flushButtonHeight(),
+      child: const Image(image: AssetImage(flushImage)),
+    );
 
-ButtonStyle lampCircleStyle(Color color) {
-  const lampBorder = CircleBorder(side: BorderSide(color: Colors.black, width: 2));
-  return ButtonStyle(
-    padding: MaterialStateProperty.all<EdgeInsets>(const EdgeInsets.all(5)),
-    shape: MaterialStateProperty.all<CircleBorder>(lampBorder),
-    minimumSize: MaterialStateProperty.all(Size.zero),
-    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-    overlayColor: MaterialStateProperty.all<Color>(Colors.transparent),
-    foregroundColor: MaterialStateProperty.all<Color>(Colors.transparent),
-    shadowColor: MaterialStateProperty.all(Colors.transparent),
-    backgroundColor: MaterialStateProperty.all<Color>(color),
-  );
-}
-
-ButtonStyle rectangleButtonStyle(double width, Color backgroundColor, Color borderColor) =>
+ButtonStyle flushButtonStyle(double width) =>
     ButtonStyle(
       padding: MaterialStateProperty.all<EdgeInsets>(const EdgeInsets.all(0)),
       shape: MaterialStateProperty.all<RoundedRectangleBorder>(
         RoundedRectangleBorder(
-          side: BorderSide(color: borderColor, width: width.rectangleBorderWidth()),
-          borderRadius: BorderRadius.circular(width.rectangleRadius()),
+          side: BorderSide(
+            color: borderBlack,
+            width: width.thinBorderWidth(),
+          ),
+          borderRadius: BorderRadius.circular(width.buttonRadius()),
         ),
       ),
       minimumSize: MaterialStateProperty.all(Size.zero),
@@ -146,27 +222,10 @@ ButtonStyle rectangleButtonStyle(double width, Color backgroundColor, Color bord
       overlayColor: MaterialStateProperty.all<Color>(Colors.transparent),
       foregroundColor: MaterialStateProperty.all<Color>(Colors.transparent),
       shadowColor: MaterialStateProperty.all(Colors.transparent),
-      backgroundColor: MaterialStateProperty.all<Color>(backgroundColor),
+      backgroundColor: MaterialStateProperty.all<Color>(whiteColor),
     );
 
-ButtonStyle wideRectangleStyle(double width, Color backgroundColor, Color borderColor) =>
-    ButtonStyle(
-      padding: MaterialStateProperty.all<EdgeInsets>(const EdgeInsets.all(0)),
-      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-        RoundedRectangleBorder(
-          side: BorderSide(color: borderColor, width: width.wideRectangleBorderWidth()),
-          borderRadius: BorderRadius.circular(width.wideRectangleRadius()),
-        ),
-      ),
-      minimumSize: MaterialStateProperty.all(Size.zero),
-      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-      overlayColor: MaterialStateProperty.all<Color>(Colors.transparent),
-      foregroundColor: MaterialStateProperty.all<Color>(Colors.transparent),
-      shadowColor: MaterialStateProperty.all(Colors.transparent),
-      backgroundColor: MaterialStateProperty.all<Color>(backgroundColor),
-    );
-
-
+///Admob Banner
 Widget adMobBannerWidget(double width, double height, BannerAd myBanner) =>
     SizedBox(
       width: width.admobWidth(),
