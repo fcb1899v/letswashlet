@@ -1,40 +1,45 @@
 name: letswashlet
 description: washlet simulator.
 publish_to: 'none'
-version: 1.0.8+8
+version: 1.1.2+12
 
 environment:
-  sdk: ">=2.12.0 <3.0.0"
-
+  sdk: '>=2.18.0 <4.0.0'
+  flutter: '>=3.3.0'
 dependencies:
   flutter:
     sdk: flutter
+
   # Firebase Analytics
-  firebase_core: ^1.17.1
-  firebase_analytics: ^9.1.9
+  firebase_core: ^3.2.0
+  firebase_analytics: ^11.2.0
   # App Icon
-  cupertino_icons: ^1.0.5
-  flutter_launcher_icons: ^0.9.3
+  cupertino_icons: ^1.0.8
+  flutter_launcher_icons: ^0.13.1
   # Audio Player
-  audioplayers: ^0.20.1
+  audioplayers: ^6.0.0
   # Vibration
-  vibration: ^1.7.4-nullsafety.0
-  # Device Info
-  device_info_plus: ^3.2.4
+  vibration: ^1.9.0
   # Admob
-  google_mobile_ads: ^1.2.0
-  app_tracking_transparency: ^2.0.2+4
+  google_mobile_ads: ^5.1.0
+  app_tracking_transparency: ^2.0.5
+  #env
+  flutter_dotenv: ^5.1.0
+  #MVVM
+  hooks_riverpod: ^2.5.1
+  flutter_hooks: ^0.20.5
   # Localize
   flutter_localizations:
     sdk: flutter
-  intl: ^0.17.0
+  intl: ^0.19.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^1.0.1
+  flutter_lints: ^4.0.0
+
   # App Splash
-  flutter_native_splash: ^2.2.3
+  flutter_native_splash: ^2.4.1
 
 flutter_icons:
   image_path: "assets/images/icon.png"
@@ -45,7 +50,7 @@ flutter_icons:
 
 flutter_native_splash:
   image: "assets/images/icon.png"
-  color: "ffffff"
+  color: "#ffffff"
 
 flutter:
   generate: true
@@ -53,13 +58,16 @@ flutter:
   assets:
     - assets/images/
     - assets/audios/
+    - assets/.env
+
   fonts:
-    - family: teleIndicators
+    - family: roboto
       fonts:
-        - asset: assets/fonts/teleindicadores.ttf
+        - asset: assets/fonts/Roboto-Regular.ttf
     - family: cornerStone
       fonts:
         - asset: assets/fonts/cornerstone.ttf
+
 
 
 

@@ -1,6 +1,40 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'constant.dart';
+
+extension ContextExt on BuildContext {
+  ///Common
+  double width() => MediaQuery.of(this).size.width;
+  double height() => MediaQuery.of(this).size.height;
+
+  ///AppBar Size
+  double appBarHeight() => (width() < 660) ? (width() - 60) / 10 + 20: 80;
+  double titleScaleFactor() => (width() < 510) ? (width() - 60) / 300: 1.5;
+
+  ///Button Size
+  double washButtonSize() => (width() < 660) ? (width() - 60) / 3 - 20: 180.0;
+  double musicButtonSize() => (width() < 660) ? (width() - 60) / 6: 100.0;
+  double volumeButtonSize() => (width() < 660) ? (width() - 60) / 10: 60.0;
+  double volumeScaleFactor() => (width() < 660) ? (width() - 60) / 300: 2.0;
+  double volumeFontSize() => (width() < 660) ? (width() - 60) / 20: 30.0;
+  double flushButtonWidth() => (width() < 660) ? (width() - 60) / 3: 200.0;
+  double flushButtonHeight() => (width() < 660) ? (width() - 60) / 8: 90.0;
+  double thickBorderWidth() => (width() < 660) ? (width() - 60) / 60: 10.0;
+  double thinBorderWidth() => (width() < 660) ? (width() - 60) / 100: 6.0;
+  double buttonRadius() => (width() < 660) ? (width() - 60) / 40: 15.0;
+  double buttonSpace() => (width() < 660) ? (width() - 60) / 25: 24.0;
+
+  ///Lamp Size
+  double lampSize() => (width() < 660) ? (width() - 60) / 25: 24.0;
+  double lampPadding() => (width() < 660) ? (width() - 60) / 150: 4.0;
+  double lampSpace() => (width() < 660) ? (width() - 60) / 240: 2.5;
+  double lampSideSpace() => (width() < 660) ? (width() - 60) / 48: 12.5;
+
+  ///Admob
+  double admobHeight() => (height() < 600) ? 50: (height() < 1000) ? 50 + (height() - 600) / 8: 100;
+  double admobWidth() => width() - 100;
+}
 
 extension StringExt on String {
 
@@ -9,11 +43,29 @@ extension StringExt on String {
       print(this);
     }
   }
+
+  ///Audio Player
+  void playAudio(AudioPlayer audioPlayer) async {
+    debugPrint();
+    await audioPlayer.setReleaseMode(ReleaseMode.stop);
+    await audioPlayer.stop();
+    await audioPlayer.setReleaseMode(ReleaseMode.release);
+    await audioPlayer.play(AssetSource(this));
+  }
+
+  void loopAudio(AudioPlayer audioPlayer) async {
+    debugPrint();
+    await audioPlayer.setReleaseMode(ReleaseMode.stop);
+    await audioPlayer.stop();
+    await audioPlayer.setReleaseMode(ReleaseMode.loop);
+    await audioPlayer.play(AssetSource(this));
+  }
+
 }
 
 extension IntExt on int {
 
-  double washVolume() => 1.5 * this;
+  double washingVolume() => 1.5 * this;
   double musicVolume() => 4 * this - 3;
   Color lampColor(int volume, Color? color) =>
       (this == volume) ? color! : Colors.black;
@@ -30,33 +82,3 @@ extension BoolExt on bool {
 
   double nozzleLength() => (this) ? 0.04: 0;
 }
-
-extension DoubleExt on double {
-
-  //App Bar
-  double appBarHeight() => (this < 660) ? (this - 60) / 10 + 20: 80;
-  double titleScaleFactor() => (this < 510) ? (this - 60) / 300: 1.5;
-
-  //Button
-  double washButtonSize() => (this < 660) ? (this - 120) / 3: 180.0;
-  double musicButtonSize() => (this < 660) ? (this - 60) / 5: 120.0;
-  double volumeButtonSize() => (this < 660) ? (this - 60) / 60 * 7: 70.0;
-  double volumeScaleFactor() => (this < 660) ? (this - 60) / 300: 2.0;
-  double flushButtonWidth() => (this < 660) ? (this - 60) / 2.5: 240.0;
-  double flushButtonHeight() => (this < 660) ? (this - 30) / 7: 90.0;
-  double thickBorderWidth() => (this < 660) ? (this - 60) / 60: 10.0;
-  double thinBorderWidth() => (this < 660) ? (this - 60) / 100: 6.0;
-  double buttonRadius() => (this < 600) ? (this - 60) / 40: 15.0;
-  double buttonSpace() => (this < 660) ? (this - 60) / 30: 20.0;
-
-  //Lamp
-  double lampSize() => (this < 660) ? (this - 60) / 25: 24.0;
-  double lampPadding() => (this < 660) ? (this - 60) / 150: 4.0;
-  double lampSpace() => (this < 660) ? (this - 60) / 120: 5.0;
-  double lampSideSpace() => (this < 660) ? (this - 60) / 40: 15.0;
-
-  //Admob
-  double admobHeight() => (this < 680) ? 50: (this < 1180) ? 50 + (this - 680) / 10: 100;
-  double admobWidth() => this - 100;
-}
-

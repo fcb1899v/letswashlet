@@ -28,11 +28,13 @@ const double flushVolume = 9;
 const int nozzleMovingTime = 3;
 
 ///Size
+const double appBarFontSize = 30;
 const double toiletImageHeightRate = 0.55;
 const double nozzleTopPaddingRate = 0.31;
 const double nozzleWidthRate = 0.01;
 const double waterImageHeightRate = 0.25;
 const double waterTopMarginRate = 0.115;
+const double volumeFontSize = 20.0;
 
 ///Color
 const Color whiteColor = Colors.white;
